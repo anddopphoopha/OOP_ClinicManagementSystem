@@ -22,7 +22,6 @@ public interface TextFileManipulation {
 			System.out.println("Error writing file to " + path);
 		}
 	}
-
 	public default void readLines(Object instance, String path, Method method, String Keyword1, String Keyword2,
 			String Keyword3, String Keyword4, String Keyword5, String Keyword6)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -34,9 +33,7 @@ public interface TextFileManipulation {
 				method.invoke(instance, readLine, Keyword1, Keyword2, Keyword3, Keyword4, Keyword5, Keyword6);
 			}
 			reader.close();
-		} catch (
-
-		IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
