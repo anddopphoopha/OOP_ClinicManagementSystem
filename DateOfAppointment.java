@@ -1,7 +1,10 @@
 package clinic;
 
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 public class DateOfAppointment {
@@ -13,14 +16,12 @@ public class DateOfAppointment {
 	private int year;
 	private int day;
 	private int month;
-
 	private String time;
 	private ErrorChecking error = new ErrorChecking();
-
 	public void setYear() {
+		String temp = "";
 		boolean checker = true;
 		while (checker) {
-			String temp = "";
 			do {
 				System.out.println("Please choose year: \n1) " + currentYear + "\n2) " + (currentYear + 1));
 				temp = input.nextLine();
@@ -28,186 +29,106 @@ public class DateOfAppointment {
 			switch (Integer.parseInt(temp)) {
 			case 1:
 				year = currentYear;
+				checker = false;
 				break;
 			case 2:
 				year = currentYear + 1;
+				checker = false;
 				break;
 			default:
-				System.out.println("This is an invalid input");
-				break;
-			}
-			if (year >= currentYear && year <= (currentYear + 1)
-					&& (year != currentYear || currentMonth != 12 || currentDay != 31 || getCurrentTime() < 16.00)) {
+				System.out.println("Input out of bounds");
 				break;
 			}
 		}
 	}
 
 	public void setMonth() {
+		String temp = "";
 		boolean checker = true;
 		while (checker) {
-			String temp = "";
 			do {
-				System.out.print("Please input month: ");
+				displayMonth();
+				System.out.println("Please input month: \nMin: 1 Max: 12");
 				temp = input.nextLine();
 			} while (error.checkNumber(temp));
 			month = Integer.parseInt(temp);
-			switch (month) {
-			case 1:
-			case 3:
-			case 5:
-			case 7:
-			case 8:
-			case 10:
-			case 12:
-				if (month >= 1 && month <= 12 && (month >= currentMonth || year > currentYear)
-						&& (currentDay != 31 || currentMonth != month || getCurrentTime() < 16.00)) {
-					checker = false;
-				}
-				break;
-			case 4:
-			case 6:
-			case 9:
-			case 11:
-				if (month >= 1 && month <= 12 && (month >= currentMonth || year > currentYear)
-						&& (currentDay != 30 || currentMonth != month || getCurrentTime() < 16.00)) {
-					checker = false;
-				}
-				break;
-			case 2:
-				if (year % 4 == 0) {
-					if (month >= 1 && month <= 12 && (month >= currentMonth || year > currentYear)
-							&& (currentDay != 29 || currentMonth != month || getCurrentTime() < 16.00)) {
-						checker = false;
-					}
-				} else {
-					if (month >= 1 && month <= 12 && (month >= currentMonth || year > currentYear)
-							&& (currentDay != 28 || currentMonth != month || getCurrentTime() < 16.00)) {
-						checker = false;
-					}
-				}
-
+			if (month > 0 && month <= 12) {
+				checker = false;
+			} else {
+				System.out.println("Input out of bounds");
 			}
 		}
 	}
 
 	public void setDay() {
+		String temp = "";
 		boolean checker = true;
 		while (checker) {
-			String temp = "";
 			do {
-				System.out.print("Please input day: ");
+				System.out.println("Please input day: \nMin: 1 Max: 30");
 				temp = input.nextLine();
 			} while (error.checkNumber(temp));
 			day = Integer.parseInt(temp);
-			switch (month) {
-			case 1:
-			case 3:
-			case 5:
-			case 7:
-			case 8:
-			case 10:
-			case 12:
-				if (day >= 1 && day <= 31 && (day >= currentDay || month > currentMonth || year > currentYear)
-						&& (getCurrentTime() < 16.00 || currentDay != day || month != currentMonth)) {
-					checker = false;
-				}
-				break;
-			case 4:
-			case 6:
-			case 9:
-			case 11:
-				if (day >= 1 && day <= 30 && (day >= currentDay || month > currentMonth || year > currentYear)
-						&& (getCurrentTime() < 16.00 || currentDay != day || month != currentMonth)) {
-					checker = false;
-				}
-				break;
-			case 2:
-				if (year % 4 == 0) {
-					if (day >= 1 && day <= 29 && (day >= currentDay || month > currentMonth)
-							&& getCurrentTime() < 16.00) {
-						checker = false;
-					}
-				} else {
-					if (day >= 1 && day <= 28 && (day >= currentDay || month > currentMonth)
-							&& getCurrentTime() < 16.00) {
-						checker = false;
-					}
-				}
-
-			}
+			if (day > 0 && day <= 30) {
+				checker = false;
+			} else
+				System.out.println("Input out of bounds");
 		}
 	}
 
 	public void displayTime() {
-		System.out.println("1) " + "09.00-10.00");
-		System.out.println("2) " + "10.00-11.00");
-		System.out.println("3) " + "11.00-12.00");
-		System.out.println("4) " + "12.00-13.00");
-		System.out.println("5) " + "13.00-14.00");
-		System.out.println("6) " + "14.00-15.00");
-		System.out.println("7) " + "15.00-16.00");
-		System.out.println("8) " + "16.00-17.00");
+		System.out.println("1) " + "09.00-10.00\n2) " + "10.00-11.00\n3) " + "11.00-12.00\n4) " + "12.00-13.00\n5) "
+				+ "13.00-14.00\n6) " + "14.00-15.00\n7) " + "15.00-16.00\n8) " + "16.00-17.00");
+	}
+
+	public void displayMonth() {
+		System.out.println("1) " + "January	2) " + "February\n3) " + "March	4) " + "April\n5) " + "May		6) "
+				+ "June\n7) " + "July		8) " + "August\n9) " + "September	10) " + "October\n11) "
+				+ "November	12) " + "December");
 	}
 
 	public void setTime() {
+		String temp = "";
 		boolean checker = true;
 		while (checker) {
-			displayTime();
-			String temp = "";
 			do {
+				displayTime();
 				System.out.println("Please choose the time: ");
 				temp = input.nextLine();
 			} while (error.checkNumber(temp));
 			int choice = Integer.parseInt(temp);
 			switch (choice) {
 			case 1:
-				if (getCurrentTime() <= 9.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "09.00-10.00";
-					checker = false;
-				}
+				time = "09.00-10.00";
+				checker = false;
 				break;
 			case 2:
-				if (getCurrentTime() <= 10.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "10.00-11.00";
-					checker = false;
-				}
+				time = "10.00-11.00";
+				checker = false;
 				break;
 			case 3:
-				if (getCurrentTime() <= 11.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "11.00-12.00";
-					checker = false;
-				}
+				time = "11.00-12.00";
+				checker = false;
 				break;
 			case 4:
-				if (getCurrentTime() <= 12.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "12.00-13.00";
-					checker = false;
-				}
+				time = "12.00-13.00";
+				checker = false;
 				break;
 			case 5:
-				if (getCurrentTime() <= 13.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "13.00-14.00";
-					checker = false;
-				}
+				time = "13.00-14.00";
+				checker = false;
 				break;
 			case 6:
-				if (getCurrentTime() <= 14.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "14.00-15.00";
-					checker = false;
-				}
+				time = "14.00-15.00";
+				checker = false;
 				break;
 			case 7:
-				if (getCurrentTime() <= 15.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "15.00-16.00";
-					checker = false;
-				}
+				time = "15.00-16.00";
+				checker = false;
 				break;
 			case 8:
-				if (getCurrentTime() <= 17.00 || day > currentDay || month > currentMonth || year > currentYear) {
-					time = "16.00-17.00";
-					checker = false;
-				}
+				time = "16.00-17.00";
+				checker = false;
 				break;
 			default:
 				System.out.println("This is an invalid input");
@@ -245,4 +166,44 @@ public class DateOfAppointment {
 	public String getCurrentDate() {
 		return currentYear + "-" + currentMonth + "-" + currentDay;
 	}
+
+	public boolean isValidDate(String date) throws ParseException {
+		String formatString;
+		SimpleDateFormat format = null;
+		formatString = "yyyy-MM-dd";
+		format = new SimpleDateFormat(formatString);
+		Date inputtedDate = format.parse(date);
+		Date currentDate = format.parse(getCurrentDate());
+		if (inputtedDate.before(currentDate)) {
+			System.out.println("This date has already passed");
+			return false;
+		} else
+			return true;
+	}
+
+	public boolean isValidDateTime() throws ParseException {
+		String formatString;
+		SimpleDateFormat format = null;
+		formatString = "yyyy-MM-dd HH.mm";
+		format = new SimpleDateFormat(formatString);
+		Date inputtedDate = format.parse(getInputtedDate() + " " + getTime());
+		Date currentDate = format.parse(getCurrentDate() + " " + getCurrentTime());
+		if (inputtedDate.before(currentDate)) {
+			System.out.println("This date has already passed");
+			return false;
+		} else
+			return true;
+	}
+
+	public String setDate() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException, ClassNotFoundException, ParseException {
+		do {
+			setYear();
+			setMonth();
+			setDay();
+		} while (!isValidDate(getInputtedDate()));
+		return getInputtedDate();
+
+	}
+
 }

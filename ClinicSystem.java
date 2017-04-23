@@ -31,32 +31,38 @@ public class ClinicSystem implements TextFileManipulation {
 		}
 	}
 
+	public String setAppointmentDate(String doctor, String patient)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+			SecurityException, ClassNotFoundException, ParseException {
+		do {
+			check = true;
+			do {
+				appointment.setYear();
+				appointment.setMonth();
+				appointment.setDay();
+				appointment.setTime();
+			} while (!appointment.isValidDateTime());
+			checkAvailability(doctor, patient);
+		} while (!check);
+		System.out.println("Completed");
+		return appointment.getInputtedDate() + "," + appointment.getTime();
+	}
+
 	public void checkAvailability(String doctor, String patient)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
 			SecurityException, ClassNotFoundException {
-		readLines(this, appointmentPath(), getMethodObject("clinic.ClinicSystem", "checkAppointment"), doctor, patient,
+		readLines(this, appointmentPath(), getMethodObject("clinic.ClinicSystem", "checkAppointments"), doctor, patient,
 				null, null, null, null);
 	}
 
-	public String inputAppointment(String doctor, String patient)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
-			SecurityException, ClassNotFoundException {
-		do {
-			appointment.setYear();
-			appointment.setMonth();
-			appointment.setDay();
-			appointment.setTime();
-			checkAvailability(doctor, patient);
-		} while (!check);
-		check = true;
-		return appointment.getInputtedDate() + "," + appointment.getTime();
-
-	}
-
-	public void checkAppointment(String readLine, String doctor, String patient, String keyword3, String keyword4,
+	public void checkAppointments(String readLine, String doctor, String patient, String keyword3, String keyword4,
 			String keyword5, String keyword6) {
 		String[] token = readLine.split(",");
-		if (token[0].equals(doctor) && token[2].equals(appointment.getInputtedDate())
+		if (token[0].equals(doctor) && token[1].equals(patient) && token[2].equals(appointment.getInputtedDate())
+				&& token[3].equals(appointment.getTime())) {
+			System.out.println("This is the same appointment");
+			this.check = false;
+		} else if (token[0].equals(doctor) && token[2].equals(appointment.getInputtedDate())
 				&& token[3].equals(appointment.getTime())) {
 			System.out.println("The doctor unavailable at this time");
 			this.check = false;
@@ -67,7 +73,7 @@ public class ClinicSystem implements TextFileManipulation {
 		}
 	}
 
-	public void getAppointment(String readLine, String keyword1, String keyword2, String keyword3, String keyword4,
+	public void getAppointmentList(String readLine, String keyword1, String keyword2, String keyword3, String keyword4,
 			String keyword5, String keyword6) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm");
 		String[] date = readLine.split(",");
@@ -79,15 +85,7 @@ public class ClinicSystem implements TextFileManipulation {
 		}
 	}
 
-	public boolean compareDates(String date, String time) {
-		String[] token = time.split("-");
-		if (getDifference(date, token[0])) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean getDifference(String date, String time) {
+	public boolean compareDates(String date) {
 		SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
 		long diff = 0;
 		long temp = 0;
@@ -99,8 +97,7 @@ public class ClinicSystem implements TextFileManipulation {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-		if (temp <= 7 && temp >= 0 && (temp > 0 || Double.parseDouble(time) >= appointment.getCurrentTime())) {
+		if (temp <= 7 && temp >= 0) {
 			return true;
 		}
 		return false;
@@ -108,8 +105,8 @@ public class ClinicSystem implements TextFileManipulation {
 
 	public void sortAllAppointment() throws NoSuchMethodException, SecurityException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException, ClassNotFoundException, IOException {
-		readLines(this, appointmentPath(), getMethodObject("clinic.ClinicSystem", "getAppointment"), null, null, null,
-				null, null, null);
+		readLines(this, appointmentPath(), getMethodObject("clinic.ClinicSystem", "getAppointmentList"), null, null,
+				null, null, null, null);
 		File newFile = new File(tempFilePath());
 		newFile.createNewFile();
 		sortAppointments(appointmentList);
@@ -130,10 +127,8 @@ public class ClinicSystem implements TextFileManipulation {
 				for (int inner = outer + 1; inner < sort.size(); inner++) {
 					String[] token1 = sort.get(inner).split(",");
 					String[] token2 = sort.get(outer).split(",");
-					String[] timeSplit1 = token1[3].split("-");
-					String[] timeSplit2 = token2[3].split("-");
-					String temp = token1[2] + " " + timeSplit1[0];
-					String temp2 = token2[2] + " " + timeSplit2[0];
+					String temp = token1[2] + " " + token1[3];
+					String temp2 = token2[2] + " " + token2[3];
 					Date date1 = sdf.parse(temp);
 					Date date2 = sdf.parse(temp2);
 					if (date1.before(date2)) {
